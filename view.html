@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+<meta name="clckd" content="7805d7b8ef7522e3b3b15fcc896e921a" />
+<title>NotePaste — Lihat Catatan</title>
+
+<script data-cfasync="false" src="https://auctionr.org/4/6ae8f126de1b500bc55ac857d3622413"></script>
+<script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
+<script data-cfasync="false" src="https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',-apple-system,sans-serif; }
+  :root {
+    --bg:#0a0e1a; --card:#1a1f2e; --border:#2a3142;
+    --text:#e8ecf3; --text-dim:#8892a6;
+    --accent:#3b82f6; --accent-2:#8b5cf6;
+    --green:#10b981; --pink:#ec4899;
+  }
+  body {
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-size:15px; line-height:1.6;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(59,130,246,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(139,92,246,0.08) 0%, transparent 40%);
+  }
+  a { color:var(--accent); }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(10,14,26,0.85);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:14px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px;
+  }
+  .logo {
+    font-size:22px; font-weight:800; letter-spacing:-0.5px;
+    background:linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo::before { content:'⚡'; -webkit-text-fill-color:initial; }
+  nav { display:flex; gap:6px; }
+  nav a {
+    color:var(--text-dim); padding:8px 16px;
+    border-radius:8px; font-weight:500; font-size:14px;
+    text-decoration:none; transition:all 0.2s;
+  }
+  nav a:hover { color:var(--text); background:var(--card); }
+  nav a.active { color:var(--text); background:var(--card); }
+
+  .container { max-width:900px; margin:0 auto; padding:32px 20px; }
+
+  .search-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:24px; margin-bottom:24px;
+  }
+  .search-box h2 {
+    font-size:16px; margin-bottom:14px; color:var(--text-dim);
+    font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
+  }
+  .search-input { display:flex; gap:10px; flex-wrap:wrap; }
+  .search-input input {
+    flex:1; min-width:200px; padding:12px 16px;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:10px; color:var(--text);
+    font-size:15px; outline:none; font-family:inherit;
+  }
+  .search-input input:focus { border-color:var(--accent); }
+
+  .btn {
+    padding:12px 24px; border:none; border-radius:10px;
+    font-size:14px; font-weight:600; cursor:pointer;
+    transition:all 0.2s; display:inline-flex;
+    align-items:center; gap:6px; font-family:inherit;
+    text-decoration:none;
+  }
+  .btn:active { transform:scale(0.98); }
+  .btn-primary {
+    background:linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color:white; box-shadow:0 4px 16px rgba(59,130,246,0.3);
+  }
+  .btn-primary:hover { box-shadow:0 6px 24px rgba(59,130,246,0.5); transform:translateY(-1px); }
+  .btn-secondary { background:var(--bg); color:var(--text-dim); border:1px solid var(--border); }
+  .btn-secondary:hover { color:var(--text); background:var(--card); }
+  .btn-wa { background:#25D366; color:white; }
+  .btn-wa:hover { background:#1da851; }
+  .btn-tg { background:#0088cc; color:white; }
+  .btn-tg:hover { background:#006699; }
+  .btn-fb { background:#1877f2; color:white; }
+  .btn-fb:hover { background:#0d5fc4; }
+
+  .view-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:28px;
+    animation: fadeIn 0.4s;
+  }
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .view-header {
+    display:flex; justify-content:space-between;
+    align-items:flex-start; gap:12px;
+    margin-bottom:14px; flex-wrap:wrap;
+  }
+  .view-title {
+    font-size:24px; font-weight:700; color:var(--text);
+    word-break:break-word; flex:1; letter-spacing:-0.5px;
+  }
+  .badge {
+    padding:5px 12px; border-radius:8px;
+    font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.5px;
+    background:rgba(59,130,246,0.15); color:var(--accent);
+    white-space:nowrap;
+  }
+  .badge.mine {
+    background:rgba(16,185,129,0.15); color:var(--green);
+  }
+  .view-meta {
+    font-size:13px; color:var(--text-dim);
+    padding-bottom:18px; margin-bottom:20px;
+    border-bottom:1px solid var(--border);
+    display:flex; flex-wrap:wrap; gap:14px;
+    align-items:center;
+  }
+  .view-content {
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:12px; padding:22px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px; line-height:1.7;
+    white-space:pre-wrap; word-wrap:break-word;
+    max-height:600px; overflow-y:auto;
+    color:var(--text);
+  }
+  .view-content a {
+    color:var(--accent); text-decoration:underline;
+    word-break:break-all; transition:all 0.2s;
+  }
+  .view-content a:hover {
+    color:var(--pink); background:rgba(59,130,246,0.1);
+    padding:2px 4px; border-radius:4px;
+  }
+
+  .link-count {
+    background:rgba(59,130,246,0.08);
+    border-left:3px solid var(--accent);
+    padding:10px 14px; border-radius:8px;
+    margin-bottom:16px; font-size:13px;
+    color:var(--text-dim);
+  }
+
+  .like-btn {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 16px;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:10px; color:var(--text-dim);
+    font-size:14px; font-weight:600;
+    font-family:inherit; cursor:pointer;
+    transition:all 0.2s; user-select:none;
+  }
+  .like-btn:hover { background:#232838; border-color:var(--pink); color:var(--pink); }
+  .like-btn.liked { background:rgba(236,72,153,0.15); border-color:var(--pink); color:var(--pink); }
+  .like-btn:active { transform:scale(0.96); }
+  .like-btn .heart { font-size:16px; transition:transform 0.2s; }
+  .like-btn.liked .heart { animation: heartBeat 0.4s; }
+  @keyframes heartBeat {
+    0% { transform:scale(1); }
+    30% { transform:scale(1.4); }
+    60% { transform:scale(0.95); }
+    100% { transform:scale(1); }
+  }
+  .like-count { font-weight:700; min-width:20px; text-align:center; }
+
+  .ad-slot {
+    background:rgba(15,23,42,0.5);
+    border:1px dashed var(--border);
+    border-radius:12px; padding:14px;
+    margin:22px 0; text-align:center;
+    min-height:60px; overflow:hidden;
+  }
+  .ad-slot-title {
+    font-size:10px; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:1.5px;
+    margin-bottom:10px; font-weight:600; opacity:0.6;
+  }
+  .ad-slot-banner {
+    min-height:250px;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+  }
+
+  .btn-group {
+    display:flex; gap:10px; margin-top:22px;
+    flex-wrap:wrap; align-items:center;
+  }
+
+  .not-found {
+    text-align:center; padding:60px 20px;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px;
+  }
+  .not-found .emoji { font-size:64px; display:block; margin-bottom:16px; }
+  .not-found h2 { color:#ef4444; margin-bottom:12px; font-size:22px; }
+  .not-found p { color:var(--text-dim); margin-bottom:24px; }
+
+  .loading { text-align:center; padding:40px; color:var(--accent); font-size:14px; }
+
+  .live-indicator {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--green);
+    padding:4px 10px; border-radius:6px;
+    background:rgba(16,185,129,0.1);
+  }
+  .live-indicator::before {
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:var(--green);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.4; transform:scale(1.3); }
+  }
+
+  .toast {
+    position:fixed; bottom:24px; right:24px;
+    background:var(--card); border:1px solid var(--border);
+    color:var(--text); padding:14px 20px;
+    border-radius:10px; font-size:14px; font-weight:500;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    opacity:0; transform:translateY(20px);
+    transition:all 0.3s; z-index:10000;
+    display:flex; align-items:center; gap:10px;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast.success { border-color:var(--green); }
+  .toast.error { border-color:#ef4444; }
+
+  footer {
+    text-align:center; padding:30px 20px;
+    color:var(--text-dim); font-size:13px;
+    border-top:1px solid var(--border);
+    margin-top:40px;
+  }
+
+  .gate-overlay {
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(10,14,26,0.95);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px; animation: gateFadeIn 0.3s;
+  }
+  @keyframes gateFadeIn { from { opacity:0; } to { opacity:1; } }
+  .gate-overlay.hidden { display:none; }
+  .gate-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:36px 28px;
+    max-width:420px; width:100%; text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    animation: gateSlideIn 0.4s;
+  }
+  @keyframes gateSlideIn {
+    from { opacity:0; transform:translateY(20px) scale(0.96); }
+    to { opacity:1; transform:translateY(0) scale(1); }
+  }
+  .gate-icon { font-size:56px; margin-bottom:16px; display:block; animation: gatePulse 1.8s infinite; }
+  @keyframes gatePulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.08); } }
+  .gate-title {
+    font-size:22px; font-weight:800; margin-bottom:10px;
+    background:linear-gradient(135deg, #fff, #8892a6);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .gate-desc { font-size:14px; color:var(--text-dim); margin-bottom:24px; line-height:1.6; }
+  .gate-btn {
+    width:100%; padding:14px 24px;
+    border:none; border-radius:12px;
+    font-size:15px; font-weight:700;
+    font-family:inherit; cursor:pointer;
+    background:linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color:white; box-shadow:0 4px 20px rgba(59,130,246,0.4);
+    transition:all 0.2s;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .gate-btn:hover { box-shadow:0 6px 28px rgba(59,130,246,0.6); transform:translateY(-1px); }
+  .gate-hint { font-size:11px; color:var(--text-dim); margin-top:14px; opacity:0.7; }
+
+  @media (max-width: 640px) {
+    header { padding:12px 16px; }
+    .logo { font-size:18px; }
+    nav a { padding:6px 10px; font-size:13px; }
+    .container { padding:20px 14px; }
+    .view-box { padding:20px; }
+    .view-title { font-size:19px; }
+    .view-content { padding:16px; font-size:13px; }
+    .btn { padding:10px 16px; font-size:13px; }
+    .ad-slot { margin:16px 0; padding:10px; }
+    .gate-box { padding:28px 20px; }
+    .gate-title { font-size:19px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-box">
+    <span class="gate-icon">⏳</span>
+    <div class="gate-title">Tunggu Sebentar</div>
+    <div class="gate-desc">
+      Buka iklan dulu 1 kali, lalu balik nonton lagi di NotePaste.
+    </div>
+    <button class="gate-btn" onclick="openAdAndContinue()">
+      🚀 Buka Iklan &amp; Lanjut
+    </button>
+    <div class="gate-hint">Klik tombol di atas untuk melanjutkan</div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">NotePaste</div>
+  <nav>
+    <a href="index.html">📤 Upload</a>
+    <a href="view.html" class="active">👁️ Lihat</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="search-box" id="searchBox" style="display:none;">
+    <h2>🔍 Cari Catatan dengan ID</h2>
+    <div class="search-input">
+      <input type="text" id="searchId" placeholder="Masukkan ID catatan...">
+      <button class="btn btn-primary" onclick="searchById()">Cari</button>
+    </div>
+  </div>
+
+  <div id="viewArea">
+    <div class="loading">⏳ Memuat catatan...</div>
+  </div>
+</div>
+
+<footer>&copy; 2025 NotePaste — Realtime</footer>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL: "https://notepaste-306db-default-rtdb.firebaseio.com"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let currentNoteId = null;
+let viewsCounted = false;
+let currentLikes = 0;
+let currentNoteRef = null;
+
+/* Ambil ownerId browser ini */
+function getMyOwnerId() {
+  try { return localStorage.getItem('notepaste_owner_id') || ''; }
+  catch (e) { return ''; }
+}
+const MY_OWNER_ID = getMyOwnerId();
+
+function getIdFromUrl() {
+  const params = new URLSearchParams(location.search);
+  return params.get('id');
+}
+function formatDate(ts) {
+  if (!ts) return '-';
+  return new Date(ts).toLocaleString('id-ID', {
+    day:'2-digit', month:'short', year:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
+}
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text == null ? '' : text;
+  return div.innerHTML;
+}
+function autoLink(text) {
+  if (!text) return '';
+  const escaped = escapeHtml(text);
+  const urlRegex = /(https?:\/\/[^\s<]+)/g;
+  return escaped.replace(urlRegex, function(url) {
+    let cleanUrl = url;
+    let trailing = '';
+    while (cleanUrl.length > 0 && /[.,;:!?)\]]$/.test(cleanUrl)) {
+      trailing = cleanUrl.slice(-1) + trailing;
+      cleanUrl = cleanUrl.slice(0, -1);
+    }
+    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer">' + cleanUrl + '</a>' + trailing;
+  });
+}
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  const icon = type === 'error' ? '⚠️' : '✅';
+  t.innerHTML = '<span>' + icon + '</span><span>' + escapeHtml(msg) + '</span>';
+  t.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
+  setTimeout(function() { t.className = 'toast'; }, 2500);
+}
+
+function getLikedKey(noteId) { return 'notepaste_liked_' + noteId; }
+function hasLiked(noteId) {
+  try { return localStorage.getItem(getLikedKey(noteId)) === '1'; }
+  catch (e) { return false; }
+}
+function setLiked(noteId, liked) {
+  try {
+    if (liked) localStorage.setItem(getLikedKey(noteId), '1');
+    else localStorage.removeItem(getLikedKey(noteId));
+  } catch (e) {}
+}
+
+function renderNote(note) {
+  const viewArea = document.getElementById('viewArea');
+  const linkCount = (note.content || '').match(/https?:\/\/[^\s<]+/g);
+  const linkInfo = linkCount
+    ? '<div class="link-count">💡 Ditemukan <strong>' + linkCount.length + '</strong> link — klik untuk membuka</div>'
+    : '';
+
+  const shareUrl = location.origin + location.pathname + '?id=' + note.id;
+  const shareText = encodeURIComponent(note.title + ' - NotePaste');
+  const shareEncoded = encodeURIComponent(shareUrl);
+
+  const likes = note.likes || 0;
+  currentLikes = likes;
+  const liked = hasLiked(note.id);
+  const isMine = note.ownerId && note.ownerId === MY_OWNER_ID;
+
+  viewArea.innerHTML = `
+    <div class="view-box">
+      <div class="view-header">
+        <div class="view-title">${escapeHtml(note.title)}</div>
+        ${isMine
+          ? '<span class="badge mine">✓ Milik Anda</span>'
+          : '<span class="badge">' + escapeHtml(note.lang || 'text') + '</span>'}
+      </div>
+      <div class="view-meta">
+        <span>📅 ${formatDate(note.createdAt)}</span>
+        <span>👁️ ${note.views || 0}x dilihat</span>
+        <span class="live-indicator">Realtime</span>
+        ${note.expiresAt ? '<span>⏰ Kadaluarsa: ' + formatDate(note.expiresAt) + '</span>' : ''}
+      </div>
+      ${linkInfo}
+      <div class="view-content">${autoLink(note.content)}</div>
+
+      <div class="ad-slot ad-slot-banner">
+        <div class="ad-slot-title">Iklan</div>
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '2bc85909669de26b545e3502cadf231e',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        <\/script>
+        <script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"><\/script>
+      </div>
+
+      <div class="btn-group">
+        <button class="like-btn ${liked ? 'liked' : ''}" id="likeBtn" onclick="toggleLike('${note.id}')">
+          <span class="heart">${liked ? '❤️' : '🤍'}</span>
+          <span>Suka</span>
+          <span class="like-count" id="likeCount">${likes}</span>
+        </button>
+        <button class="btn btn-primary" onclick="copyCurrentLink('${note.id}')">📋 Copy Link</button>
+        <button class="btn btn-wa" onclick="shareWA('${shareEncoded}', '${shareText}')">💬 WhatsApp</button>
+        <button class="btn btn-tg" onclick="shareTG('${shareEncoded}', '${shareText}')">✈️ Telegram</button>
+        <button class="btn btn-fb" onclick="shareFB('${shareEncoded}')">📘 Facebook</button>
+        <a href="index.html" class="btn btn-secondary">➕ Buat Baru</a>
+      </div>
+    </div>`;
+
+  const adScripts = viewArea.querySelectorAll('.ad-slot script');
+  adScripts.forEach(function(oldScript) {
+    const newScript = document.createElement('script');
+    Array.from(oldScript.attributes).forEach(function(attr) {
+      newScript.setAttribute(attr.name, attr.value);
+    });
+    newScript.textContent = oldScript.textContent;
+    oldScript.parentNode.replaceChild(newScript, oldScript);
+  });
+}
+
+function renderNotFound(id) {
+  document.getElementById('viewArea').innerHTML = `
+    <div class="not-found">
+      <span class="emoji">🔍</span>
+      <h2>Catatan Tidak Ditemukan</h2>
+      <p>ID <strong>${escapeHtml(id)}</strong> tidak ada di database.</p>
+      <a href="index.html" class="btn btn-primary">📤 Buat Catatan Baru</a>
+    </div>`;
+}
+
+function renderExpired() {
+  document.getElementById('viewArea').innerHTML = `
+    <div class="not-found">
+      <span class="emoji">⏰</span>
+      <h2>Catatan Sudah Kadaluarsa</h2>
+      <p>Catatan ini telah melewati masa berlakunya.</p>
+      <a href="index.html" class="btn btn-primary">📤 Buat Catatan Baru</a>
+    </div>`;
+}
+
+function updateLikeUI(likes, noteId) {
+  const countEl = document.getElementById('likeCount');
+  const btnEl = document.getElementById('likeBtn');
+  if (countEl) countEl.textContent = likes;
+  if (btnEl) {
+    const liked = hasLiked(noteId);
+    if (liked) {
+      btnEl.classList.add('liked');
+      btnEl.querySelector('.heart').textContent = '❤️';
+    } else {
+      btnEl.classList.remove('liked');
+      btnEl.querySelector('.heart').textContent = '🤍';
+    }
+  }
+}
+
+window.toggleLike = async function(noteId) {
+  if (!currentNoteRef) return;
+  const liked = hasLiked(noteId);
+  const newCount = liked ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+  currentLikes = newCount;
+  setLiked(noteId, !liked);
+  updateLikeUI(newCount, noteId);
+
+  try {
+    await update(currentNoteRef, { likes: newCount });
+    if (!liked) showToast('Terima kasih sudah suka!', 'success');
+  } catch (err) {
+    currentLikes = liked ? newCount + 1 : newCount - 1;
+    setLiked(noteId, liked);
+    updateLikeUI(currentLikes, noteId);
+    showToast('Gagal menyimpan like: ' + err.message, 'error');
+  }
+};
+
+function listenNote(id) {
+  currentNoteId = id;
+  currentNoteRef = ref(db, 'notes/' + id);
+
+  onValue(currentNoteRef, function(snapshot) {
+    if (!snapshot.exists()) { renderNotFound(id); return; }
+    const note = snapshot.val();
+    if (note.expiresAt && note.expiresAt < Date.now()) {
+      renderExpired();
+      remove(currentNoteRef).catch(function(){});
+      return;
+    }
+    if (!viewsCounted) {
+      viewsCounted = true;
+      const newViews = (note.views || 0) + 1;
+      update(currentNoteRef, { views: newViews }).catch(function(){});
+      note.views = newViews;
+    }
+    currentLikes = note.likes || 0;
+    const existingCount = document.getElementById('likeCount');
+    if (existingCount) {
+      updateLikeUI(currentLikes, id);
+    } else {
+      renderNote(note);
+    }
+  }, function(error) {
+    console.error(error);
+    document.getElementById('viewArea').innerHTML = `
+      <div class="not-found">
+        <span class="emoji">⚠️</span>
+        <h2>Gagal Memuat</h2>
+        <p>${escapeHtml(error.message)}</p>
+        <a href="#" onclick="location.reload(); return false;" class="btn btn-primary">🔄 Coba Lagi</a>
+      </div>`;
+  });
+}
+
+window.copyCurrentLink = function(id) {
+  const link = location.origin + location.pathname + '?id=' + id;
+  navigator.clipboard.writeText(link)
+    .then(function() { showToast('Link disalin!', 'success'); })
+    .catch(function() { showToast('Gagal copy', 'error'); });
+};
+window.searchById = function() {
+  const id = document.getElementById('searchId').value.trim();
+  if (!id) { showToast('Masukkan ID dulu', 'error'); return; }
+  location.href = 'view.html?id=' + id;
+};
+window.shareWA = function(url, text) {
+  window.open('https://wa.me/?text=' + text + '%20' + url, '_blank');
+};
+window.shareTG = function(url, text) {
+  window.open('https://t.me/share/url?url=' + url + '&text=' + text, '_blank');
+};
+window.shareFB = function(url) {
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank');
+};
+
+window.openAdAndContinue = function() {
+  try {
+    window.open('https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1', '_blank', 'noopener');
+  } catch (e) {}
+  const overlay = document.getElementById('gateOverlay');
+  if (overlay) overlay.classList.add('hidden');
+};
+
+window.addEventListener('DOMContentLoaded', function() {
+  const id = getIdFromUrl();
+  if (id) {
+    document.getElementById('searchBox').style.display = 'none';
+    listenNote(id);
+  } else {
+    document.getElementById('searchBox').style.display = 'block';
+    document.getElementById('viewArea').innerHTML = `
+      <div class="not-found">
+        <span class="emoji">📭</span>
+        <h2>Belum Ada Catatan Dipilih</h2>
+        <p>Masukkan ID catatan di atas, atau buat catatan baru.</p>
+        <a href="index.html" class="btn btn-primary">📤 Buat Catatan Baru</a>
+      </div>`;
+  }
+});
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set, onDisconnect }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const app2 = initializeApp({ databaseURL: "https://notepaste-306db-default-rtdb.firebaseio.com" }, "presence-app");
+const db2 = getDatabase(app2);
+
+const sessionId = 'view_' + Math.random().toString(36).slice(2, 10);
+const sessionRef = ref(db2, 'presence/' + sessionId);
+
+function heartbeat() {
+  set(sessionRef, { page: 'view', lastSeen: Date.now() }).catch(function(){});
+  onDisconnect(sessionRef).remove().catch(function(){});
+}
+heartbeat();
+setInterval(heartbeat, 15000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@ad-shield/adblock-detector@latest/dist/index.min.js"></script>
+<script>
+  (function() {
+    if (typeof window.adblockDetector === 'undefined') return;
+    window.adblockDetector.detectAdblock().then(function(result) {
+      if (result && result.isAdBlocked) {
+        var overlay = document.createElement('div');
+        overlay.id = 'adblock-warning-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,14,26,0.97);display:flex;align-items:center;justify-content:center;padding:20px;';
+        overlay.innerHTML = [
+          '<div style="background:#1a1f2e;border:1px solid #2a3142;border-radius:16px;padding:32px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);">',
+            '<div style="font-size:48px;margin-bottom:16px;">🛑</div>',
+            '<h2 style="font-size:20px;font-weight:700;color:#e8ecf3;margin-bottom:10px;">AdBlock Terdeteksi</h2>',
+            '<p style="font-size:14px;color:#8892a6;line-height:1.6;margin-bottom:20px;">Mohon matikan AdBlock untuk situs ini, lalu klik tombol di bawah untuk melanjutkan.</p>',
+            '<button onclick="window.location.reload()" style="width:100%;padding:14px 24px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:white;">🔄 Saya Sudah Matikan AdBlock</button>',
+          '</div>'
+        ].join('');
+        document.body.appendChild(overlay);
+      }
+    }).catch(function(err) {
+      console.warn('Adblock detection error:', err);
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+<meta name="aca5cdf6c93772ecabb2154241feb6a68e740c05" content="aca5cdf6c93772ecabb2154241feb6a68e740c05" />
+<meta name="clckd" content="7805d7b8ef7522e3b3b15fcc896e921a" />
+<title>NotePaste — Bagikan Catatan & Link Secara Instan</title>
+<meta name="description" content="NotePaste adalah platform berbagi catatan, kode, dan link secara instan dan gratis. Tanpa registrasi, dapat diakses dari mana saja.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',-apple-system,sans-serif; }
+  :root {
+    --bg:#0a0e1a; --card:#1a1f2e; --card-hover:#232838;
+    --border:#2a3142; --text:#e8ecf3; --text-dim:#8892a6;
+    --accent:#3b82f6; --accent-2:#8b5cf6;
+    --pink:#ec4899; --green:#10b981;
+  }
+  body {
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-size:15px; line-height:1.6;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(59,130,246,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(139,92,246,0.08) 0%, transparent 40%);
+  }
+  a { color:var(--accent); text-decoration:none; }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(10,14,26,0.85);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:14px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px;
+  }
+  .logo {
+    font-size:22px; font-weight:800; letter-spacing:-0.5px;
+    background:linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo::before { content:'⚡'; -webkit-text-fill-color:initial; font-size:20px; }
+  nav { display:flex; gap:6px; }
+  nav a {
+    color:var(--text-dim); padding:8px 16px;
+    border-radius:8px; font-weight:500; font-size:14px;
+    transition:all 0.2s;
+  }
+  nav a:hover { color:var(--text); background:var(--card); }
+  nav a.active {
+    color:var(--text); background:var(--card);
+    box-shadow:0 0 0 1px var(--border);
+  }
+
+  .container { max-width:960px; margin:0 auto; padding:32px 20px; }
+
+  .hero { text-align:center; margin-bottom:32px; }
+  .hero h1 {
+    font-size:38px; font-weight:800; letter-spacing:-1px;
+    margin-bottom:12px;
+    background:linear-gradient(135deg, #fff, #8892a6);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .hero p { color:var(--text-dim); font-size:16px; }
+
+  .card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px;
+    margin-bottom:20px;
+    transition:border-color 0.2s, transform 0.2s;
+  }
+
+  .editor-card { padding:28px; }
+
+  .form-group { margin-bottom:16px; }
+  .form-group label {
+    display:block; margin-bottom:8px;
+    font-size:13px; font-weight:600;
+    color:var(--text-dim); text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width:100%; padding:12px 16px;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:10px; color:var(--text);
+    font-size:15px; font-family:inherit;
+    outline:none; transition:all 0.2s;
+  }
+  .form-group textarea {
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px; line-height:1.6;
+    min-height:220px; resize:vertical;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(59,130,246,0.15);
+  }
+
+  .form-row {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+
+  .btn {
+    padding:12px 24px; border:none; border-radius:10px;
+    font-size:14px; font-weight:600; cursor:pointer;
+    transition:all 0.2s; display:inline-flex;
+    align-items:center; gap:6px;
+    font-family:inherit;
+  }
+  .btn:active { transform:scale(0.98); }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .btn-primary {
+    background:linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color:white;
+    box-shadow:0 4px 16px rgba(59,130,246,0.3);
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow:0 6px 24px rgba(59,130,246,0.5);
+    transform:translateY(-1px);
+  }
+  .btn-secondary { background:var(--bg); color:var(--text-dim); border:1px solid var(--border); }
+  .btn-secondary:hover { color:var(--text); background:var(--card-hover); }
+  .btn-sm { padding:8px 14px; font-size:13px; }
+  .btn-group { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+
+  .link-result {
+    display:none; margin-top:20px;
+    background:rgba(16,185,129,0.05);
+    border:1px solid rgba(16,185,129,0.3);
+    border-radius:12px; padding:20px;
+    animation: slideIn 0.3s;
+  }
+  .link-result.show { display:block; }
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(-10px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .link-result h3 {
+    color:var(--green); margin-bottom:12px; font-size:15px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .link-box { display:flex; gap:8px; flex-wrap:wrap; }
+  .link-box input {
+    flex:1; min-width:200px; padding:12px 14px;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; color:var(--text);
+    font-size:13px; font-family:'JetBrains Mono',monospace;
+    outline:none;
+  }
+  .link-box input:focus { border-color:var(--green); }
+
+  .toast {
+    position:fixed; bottom:24px; right:24px;
+    background:var(--card); border:1px solid var(--border);
+    color:var(--text); padding:14px 20px;
+    border-radius:10px; font-size:14px; font-weight:500;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    opacity:0; transform:translateY(20px);
+    transition:all 0.3s; z-index:1000;
+    display:flex; align-items:center; gap:10px;
+    max-width:90vw;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast.success { border-color:var(--green); }
+  .toast.error { border-color:#ef4444; }
+
+  footer {
+    text-align:center; padding:30px 20px;
+    color:var(--text-dim); font-size:13px;
+    border-top:1px solid var(--border);
+    margin-top:40px;
+  }
+
+  @media (max-width: 640px) {
+    header { padding:12px 16px; }
+    .logo { font-size:18px; }
+    nav a { padding:6px 10px; font-size:13px; }
+    .container { padding:20px 14px; }
+    .hero h1 { font-size:26px; }
+    .hero p { font-size:14px; }
+    .editor-card { padding:20px; }
+    .form-row { grid-template-columns:1fr; }
+    .btn { padding:10px 18px; font-size:13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">NotePaste</div>
+  <nav>
+    <a href="index.html" class="active">📤 Upload</a>
+    <a href="view.html">👁️ Lihat</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Bagikan Catatan & Link Secara Instan</h1>
+    <p>Upload, dapatkan link, dan bagikan ke siapa saja. Gratis, tanpa registrasi.</p>
+  </div>
+
+  <div class="card editor-card">
+    <div class="form-group">
+      <label>Judul</label>
+      <input type="text" id="noteTitle" placeholder="Contoh: Promo Sepatu Nike" maxlength="100">
+    </div>
+
+    <div class="form-group">
+      <label>Konten</label>
+      <textarea id="noteContent" placeholder="Tulis catatan, kode, atau link di sini..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Format</label>
+        <select id="noteLang">
+          <option value="text">📝 Plain Text</option>
+          <option value="javascript">⚡ JavaScript</option>
+          <option value="html">🌐 HTML</option>
+          <option value="css">🎨 CSS</option>
+          <option value="python">🐍 Python</option>
+          <option value="json">🔧 JSON</option>
+          <option value="markdown">📄 Markdown</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Kadaluarsa</label>
+        <select id="noteExpire">
+          <option value="never">♾️ Tidak Pernah</option>
+          <option value="1h">⏱️ 1 Jam</option>
+          <option value="1d">📅 1 Hari</option>
+          <option value="7d">📆 7 Hari</option>
+          <option value="30d">🗓️ 30 Hari</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" id="btnUpload" onclick="uploadNote()">
+        🚀 Upload & Dapatkan Link
+      </button>
+      <button class="btn btn-secondary" onclick="clearEditor()">
+        🗑️ Bersihkan
+      </button>
+    </div>
+
+    <div class="link-result" id="linkResult">
+      <h3>✅ Berhasil diupload!</h3>
+      <div class="link-box">
+        <input type="text" id="shareLink" readonly>
+        <button class="btn btn-primary btn-sm" onclick="copyLink()">📋 Copy</button>
+      </div>
+      <div style="margin-top:12px;">
+        <a id="openLink" href="#" target="_blank" style="font-size:14px;">
+          🔗 Buka catatan →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 NotePaste — Data tersimpan di Firebase
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, set }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL: "https://notepaste-306db-default-rtdb.firebaseio.com"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+function getOwnerId() {
+  try {
+    let id = localStorage.getItem('notepaste_owner_id');
+    if (!id) {
+      id = 'owner_' + crypto.randomUUID().replace(/-/g, '');
+      localStorage.setItem('notepaste_owner_id', id);
+    }
+    return id;
+  } catch (e) {
+    return 'owner_fallback';
+  }
+}
+const MY_OWNER_ID = getOwnerId();
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text == null ? '' : text;
+  return div.innerHTML;
+}
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  const icon = type === 'error' ? '⚠️' : '✅';
+  t.innerHTML = '<span>' + icon + '</span><span>' + escapeHtml(msg) + '</span>';
+  t.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
+  setTimeout(function() { t.className = 'toast'; }, 2500);
+}
+
+window.uploadNote = async function() {
+  const title = document.getElementById('noteTitle').value.trim() || 'Tanpa Judul';
+  const content = document.getElementById('noteContent').value.trim();
+  const lang = document.getElementById('noteLang').value;
+  const expire = document.getElementById('noteExpire').value;
+
+  if (!content) {
+    showToast('Konten tidak boleh kosong!', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnUpload');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Mengupload...';
+
+  try {
+    const now = Date.now();
+    let expiresAt = null;
+    if (expire !== 'never') {
+      const map = { '1h':3600000, '1d':86400000, '7d':604800000, '30d':2592000000 };
+      expiresAt = now + map[expire];
+    }
+
+    const notesRef = ref(db, 'notes');
+    const newRef = push(notesRef);
+    await set(newRef, {
+      id: newRef.key,
+      title: title,
+      content: content,
+      lang: lang,
+      createdAt: now,
+      updatedAt: now,
+      expiresAt: expiresAt,
+      views: 0,
+      likes: 0,
+      ownerId: MY_OWNER_ID
+    });
+
+    const link = location.origin + location.pathname.replace('index.html', '') + 'view.html?id=' + newRef.key;
+    document.getElementById('shareLink').value = link;
+    document.getElementById('openLink').href = link;
+    document.getElementById('linkResult').classList.add('show');
+
+    showToast('Berhasil diupload!', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Upload & Dapatkan Link';
+  }
+};
+
+window.clearEditor = function() {
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteContent').value = '';
+  document.getElementById('noteLang').value = 'text';
+  document.getElementById('noteExpire').value = 'never';
+  document.getElementById('linkResult').classList.remove('show');
+};
+
+window.copyLink = function() {
+  const input = document.getElementById('shareLink');
+  input.select();
+  input.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(input.value)
+    .then(function() { showToast('Link disalin!', 'success'); })
+    .catch(function() { showToast('Gagal copy', 'error'); });
+};
+</script>
+
+</body>
+</html>
